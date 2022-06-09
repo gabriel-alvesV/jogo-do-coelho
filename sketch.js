@@ -16,11 +16,22 @@ var ligacao;
 var fundo, frutaImagem, coelho;
 var spritecoelho
 var botao;
+var piscando, comendo,triste;
 
 function preload(){
   fundo = loadImage("background.png");
   frutaImagem = loadImage("melon.png");
   coelho = loadImage("Rabbit-01.png");
+  piscando = loadAnimation("blink_1.png","blink_2.png","blink_3.png");
+  comendo = loadAnimation("eat_0.png","eat_1.png","eat_2.png","eat_3.png","eat_4.png");
+  triste=loadAnimation("sad_1.png","sad_2.png","sad_3.png");
+
+
+  piscando.playing = true;
+  comendo.playing = true;
+  comendo.looping = false;
+  triste.playing=true;
+ triste.looping=false;
 }
 
 function setup() 
@@ -28,7 +39,11 @@ function setup()
   createCanvas(500,700);
   engine = Engine.create();
   world = engine.world;
- 
+
+  piscando.frameDelay = 15;
+  comendo.frameDelay = 15;
+  triste.frameDelay=15;
+
   rectMode(CENTER);
   ellipseMode(RADIUS);
   imageMode(CENTER);
@@ -39,9 +54,14 @@ function setup()
  fruta=Bodies.circle(300,300,15);
  Matter.Composite.add(corda.body,fruta);
 ligacao= new Restricao(corda,fruta);
-spritecoelho=createSprite(250,650,100,100);
+
+spritecoelho=createSprite(250,630,100,100);
 spritecoelho.addImage(coelho);
 spritecoelho.scale=0.2;
+spritecoelho.addAnimation("piscando", piscando);
+spritecoelho.addAnimation("comendo", comendo);
+spritecoelho.addAnimation("triste",triste);
+spritecoelho.changeAnimation("piscando");
 
 botao=createImg('cut_btn.png');
 botao.position(220,30);
@@ -60,7 +80,20 @@ function draw()
   Engine.update(engine);
   chao.mostrar();
   corda.show();
-  image(frutaImagem, fruta.position.x,fruta.position.y,60,60);
+  if(fruta!==null){
+    image(frutaImagem, fruta.position.x,fruta.position.y,60,60);
+  }
+  if(colisao(fruta,spritecoelho)===true){
+    spritecoelho.changeAnimation("comendo");
+  }
+
+if(fruta!==null&&fruta.position.y>=650){
+  spritecoelho.changeAnimation("triste");
+ fruta= null;
+
+}
+
+  
   drawSprites();
 }
 
@@ -69,5 +102,20 @@ function cortar(){
   corda.break()
   ligacao.separar();
   ligacao=null;
+}
+
+function colisao(corpo,sprite){
+  if(corpo!==null){
+    var queda=dist(corpo.position.x,corpo.position.y,sprite.position.x,sprite.position.y);
+ if(queda<=80){
+   World.remove(engine.world,fruta);
+   fruta=null;
+   return true;
+ }
+   else{
+     return false;
+   }
+
+  }
 }
 
