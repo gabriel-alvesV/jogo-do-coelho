@@ -17,6 +17,9 @@ var fundo, frutaImagem, coelho;
 var spritecoelho
 var botao;
 var piscando, comendo,triste;
+var musicaFundo, musica, perder, ganhar, musicaVento;
+var balao; 
+var mute;
 
 function preload(){
   fundo = loadImage("background.png");
@@ -25,7 +28,11 @@ function preload(){
   piscando = loadAnimation("blink_1.png","blink_2.png","blink_3.png");
   comendo = loadAnimation("eat_0.png","eat_1.png","eat_2.png","eat_3.png","eat_4.png");
   triste=loadAnimation("sad_1.png","sad_2.png","sad_3.png");
-
+  musicaFundo = loadSound("sound1.mp3");
+  musica = loadSound("rope_cut.mp3");
+  perder = loadSound("sad.wav");
+  ganhar = loadSound("eating_sound.mp3");
+  musicaVento = loadSound("air.wav");
 
   piscando.playing = true;
   comendo.playing = true;
@@ -37,6 +44,8 @@ function preload(){
 function setup() 
 {
   createCanvas(500,700);
+  musicaFundo.play();
+  musicaFundo.setVolume(0.3);
   engine = Engine.create();
   world = engine.world;
 
@@ -55,7 +64,7 @@ function setup()
  Matter.Composite.add(corda.body,fruta);
 ligacao= new Restricao(corda,fruta);
 
-spritecoelho=createSprite(250,630,100,100);
+spritecoelho=createSprite(420,630,100,100);
 spritecoelho.addImage(coelho);
 spritecoelho.scale=0.2;
 spritecoelho.addAnimation("piscando", piscando);
@@ -67,6 +76,16 @@ botao=createImg('cut_btn.png');
 botao.position(220,30);
 botao.size(50,50);
 botao.mouseClicked(cortar);
+
+balao=createImg('balloon.png');
+balao.position(10,200);
+balao.size(150,100);
+balao.mouseClicked(vento);
+
+mute=createImg('mute.png');
+mute.position(450,20);
+mute.size(50,50);
+mute.mouseClicked(mudo);
 }
 
 function draw() 
@@ -85,12 +104,14 @@ function draw()
   }
   if(colisao(fruta,spritecoelho)===true){
     spritecoelho.changeAnimation("comendo");
+    ganhar.play();
   }
 
 if(fruta!==null&&fruta.position.y>=650){
   spritecoelho.changeAnimation("triste");
  fruta= null;
-
+musicaFundo.stop();
+perder.play();
 }
 
   
@@ -102,6 +123,7 @@ function cortar(){
   corda.break()
   ligacao.separar();
   ligacao=null;
+  musica.play();
 }
 
 function colisao(corpo,sprite){
@@ -119,3 +141,17 @@ function colisao(corpo,sprite){
   }
 }
 
+function   vento(){
+  Matter.Body.applyForce(fruta,{x:0,y:0},{x:0.01,y:0});
+  musicaVento.play();
+}
+
+function mudo(){
+  if(musicaFundo.isPlaying()){
+    musicaFundo.stop();
+  }
+
+else{
+  musicaFundo.play();
+}
+}
