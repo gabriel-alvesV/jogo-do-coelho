@@ -20,6 +20,14 @@ var piscando, comendo,triste;
 var musicaFundo, musica, perder, ganhar, musicaVento;
 var balao; 
 var mute;
+var botao2;
+var botao3;
+var corda2;
+var corda3;
+var ligacao2;
+var ligacao3;
+
+
 
 function preload(){
   fundo = loadImage("background.png");
@@ -59,12 +67,18 @@ function setup()
   textSize(50);
 
   chao = new Chao(200, 690, 600, 20);
- corda= new Rope(6,{x:245,y:30});
+ corda= new Rope(8,{x:40,y:30});
+ corda2= new Rope(7,{x:370,y:40});
+ corda3= new Rope(4,{x:400,y:225});
+
+
  fruta=Bodies.circle(300,300,15);
  Matter.Composite.add(corda.body,fruta);
 ligacao= new Restricao(corda,fruta);
+ligacao2= new Restricao(corda2,fruta);
+ligacao3= new Restricao(corda3,fruta);
 
-spritecoelho=createSprite(420,630,100,100);
+spritecoelho=createSprite(170,630,100,100);
 spritecoelho.addImage(coelho);
 spritecoelho.scale=0.2;
 spritecoelho.addAnimation("piscando", piscando);
@@ -73,14 +87,20 @@ spritecoelho.addAnimation("triste",triste);
 spritecoelho.changeAnimation("piscando");
 
 botao=createImg('cut_btn.png');
-botao.position(220,30);
+botao.position(20,30);
 botao.size(50,50);
 botao.mouseClicked(cortar);
 
-balao=createImg('balloon.png');
-balao.position(10,200);
-balao.size(150,100);
-balao.mouseClicked(vento);
+botao2=createImg('cut_btn.png');
+botao2.position(330,35);
+botao2.size(50,50);
+botao2.mouseClicked(cortar2);
+
+botao3=createImg('cut_btn.png');
+botao3.position(360,200);
+botao3.size(50,50);
+botao3.mouseClicked(cortar3);
+
 
 mute=createImg('mute.png');
 mute.position(450,20);
@@ -98,7 +118,12 @@ function draw()
 
   Engine.update(engine);
   chao.mostrar();
+
+
   corda.show();
+  corda2.show();
+  corda3.show();
+
   if(fruta!==null){
     image(frutaImagem, fruta.position.x,fruta.position.y,60,60);
   }
@@ -154,4 +179,19 @@ function mudo(){
 else{
   musicaFundo.play();
 }
+}
+
+function cortar2(){
+  corda2.break()
+  ligacao2.separar();
+  ligacao2=null;
+  musica.play();
+
+}
+
+function cortar3(){
+  corda3.break()
+  ligacao3.separar();
+  ligacao3=null;
+  musica.play();
 }
